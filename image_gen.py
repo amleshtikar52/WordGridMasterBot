@@ -1,40 +1,42 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
+import random
 import io
 
-
-def generate_grid_image(grid):
-    size = len(grid)
-    cell = 70
-    pad = 20
-
-    img_size = size * cell + pad * 2
-    img = Image.new("RGB", (img_size, img_size), "white")
+def generate_image(grid_size, words):
+    img = Image.new("RGB", (720, 900), "white")
     draw = ImageDraw.Draw(img)
 
-    try:
-        font = ImageFont.truetype("DejaVuSans-Bold.ttf", 36)
-    except:
-        font = ImageFont.load_default()
+    cell = 50
+    sx, sy = 40, 40
 
-    for r in range(size):
-        for c in range(size):
-            x1 = pad + c * cell
-            y1 = pad + r * cell
-            x2 = x1 + cell
-            y2 = y1 + cell
+    letters = [chr(random.randint(65, 90)) for _ in range(grid_size * grid_size)]
+    i = 0
 
-            draw.rectangle([x1, y1, x2, y2], outline="black", width=2)
+    for r in range(grid_size):
+        for c in range(grid_size):
+            x = sx + c * cell
+            y = sy + r * cell
+            draw.rectangle([x, y, x+cell, y+cell], outline="black")
+            draw.text((x+18, y+12), letters[i], fill="black")
+            i += 1
 
-            letter = grid[r][c]
-            w, h = draw.textsize(letter, font=font)
-            draw.text(
-                (x1 + (cell - w) / 2, y1 + (cell - h) / 2),
-                letter,
-                fill="black",
-                font=font
-            )
+    y = sy + grid_size * cell + 30
+    draw.text((40, y), "🔥 WORD GRID CHALLENGE 🔥", fill="black")
+    y += 40
+
+    draw.text((40, y), "Find these words:", fill="black")
+    y += 30
+
+    for w in words:
+        hint = w[0] + "-" * (len(w)-1)
+        draw.text((40, y), f"{hint} ({len(w)})", fill="black")
+        y += 25
+
+    y += 20
+    draw.text((40, y), "Type the words you find to score points!", fill="black")
 
     bio = io.BytesIO()
+    bio.name = "wordgrid.png"
     img.save(bio, "PNG")
     bio.seek(0)
     return bio
