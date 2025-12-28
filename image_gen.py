@@ -1,29 +1,40 @@
 from PIL import Image, ImageDraw, ImageFont
+import io
 
-def generate_image(grid, words, found):
+
+def generate_grid_image(grid):
     size = len(grid)
-    img = Image.new("RGB", (600, 700), "#111111")
-    d = ImageDraw.Draw(img)
+    cell = 70
+    pad = 20
 
-    cell = 40
-    x0, y0 = 50, 50
+    img_size = size * cell + pad * 2
+    img = Image.new("RGB", (img_size, img_size), "white")
+    draw = ImageDraw.Draw(img)
 
-    for i in range(size):
-        for j in range(size):
-            d.rectangle(
-                [x0+j*cell, y0+i*cell, x0+(j+1)*cell, y0+(i+1)*cell],
-                outline="white"
+    try:
+        font = ImageFont.truetype("DejaVuSans-Bold.ttf", 36)
+    except:
+        font = ImageFont.load_default()
+
+    for r in range(size):
+        for c in range(size):
+            x1 = pad + c * cell
+            y1 = pad + r * cell
+            x2 = x1 + cell
+            y2 = y1 + cell
+
+            draw.rectangle([x1, y1, x2, y2], outline="black", width=2)
+
+            letter = grid[r][c]
+            w, h = draw.textsize(letter, font=font)
+            draw.text(
+                (x1 + (cell - w) / 2, y1 + (cell - h) / 2),
+                letter,
+                fill="black",
+                font=font
             )
-            d.text(
-                (x0+j*cell+12, y0+i*cell+8),
-                grid[i][j],
-                fill="white"
-            )
 
-    y_words = y0 + size*cell + 20
-    for w in words:
-        status = "✅" if w in found else "❌"
-        d.text((50, y_words), f"{status} {w[0].upper()}-- ({len(w)})", fill="white")
-        y_words += 30
-
-    return img
+    bio = io.BytesIO()
+    img.save(bio, "PNG")
+    bio.seek(0)
+    return bio
