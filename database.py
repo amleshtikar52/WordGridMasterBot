@@ -1,26 +1,18 @@
 from collections import defaultdict
 
-# Active games
-games = {}  # chat_id -> game_data
+scores = defaultdict(int)
 
-# Scores
-group_scores = defaultdict(lambda: defaultdict(int))
-global_scores = defaultdict(int)
+def add_score(user_id, points):
+    scores[user_id] += points
 
-# Achievements
-achievements = defaultdict(set)
+def remove_score(user_id, points):
+    scores[user_id] -= points
 
+def reset_score(user_id):
+    scores[user_id] = 0
 
-def add_score(chat_id, user_id, points):
-    group_scores[chat_id][user_id] += points
-    global_scores[user_id] += points
+def get_score(user_id):
+    return scores[user_id]
 
-
-def sub_score(chat_id, user_id, points):
-    group_scores[chat_id][user_id] -= points
-    global_scores[user_id] -= points
-
-
-def set_score(chat_id, user_id, value):
-    group_scores[chat_id][user_id] = value
-    global_scores[user_id] = value
+def get_leaderboard(limit=10):
+    return sorted(scores.items(), key=lambda x: x[1], reverse=True)[:limit]
