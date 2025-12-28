@@ -27,15 +27,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     await update.message.reply_photo(
-        photo="https://i.imgur.com/9YQZQ9G.png",
+        photo=photo,
         caption=(
-            "👋 **Welcome to Word Grid!**\n\n"
-            "🎮 Multiplayer word puzzle game\n"
-            "➕ Add me to a group\n"
-            "▶️ Use /new or /new_hard to start"
-        ),
-        parse_mode="Markdown",
-        reply_markup=InlineKeyboardMarkup(keyboard)
+            f"👋 Hello {name}!\n\n"
+            "I'm a Word Grid Bot 🧩\n\n"
+            "➤ Add me to a group\n"
+            "➤ Use /new or /newhard to start game\n\n"
+            "🎯 Everyone in the group can play together!"
+        )
     )
 
 
